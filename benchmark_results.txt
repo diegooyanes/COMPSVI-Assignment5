@@ -1,0 +1,77 @@
+GREEDY ALGORITHMS ASSIGNMENT
+======================================================================
+TESTING PACKAGE PRIORITIZATION
+======================================================================
+
+Test 1: Non-overlapping
+  Expected: 3 deliveries
+  Got: 3 deliveries
+  PASS
+
+Test 2: All overlapping
+  Expected: 1-2 deliveries (depends on greedy choice)
+  Got: 1 deliveries
+  Result: ['B']
+
+Test 3: Mixed overlapping
+  Expected: 2 deliveries (A ends at 3, C starts at 4)
+  Got: 2 deliveries
+  Result: ['A', 'C']
+  PASS
+
+======================================================================
+TESTING TRUCK LOADING
+======================================================================
+
+Test 1: All packages fit
+  Expected: Total priority = 160, weight = 30
+  Got: Priority = 160.0, weight = 30.0
+  PASS
+
+Test 2: Fractional knapsack
+  Expected: Take A (full), B (full), C (partial)
+  Expected priority: ~240 (60 + 100 + 80 from 2/3 of C)
+  Got: Priority = 240.0, weight = 50.0
+  Packages: [{'package_id': 'A', 'fraction': 1.0}, {'package_id': 'B', 'fraction': 1.0}, {'package_id': 'C', 'fraction': 0.6666666666666666}]
+
+======================================================================
+TESTING DRIVER ASSIGNMENT
+======================================================================
+
+Test 1: Non-overlapping
+  Expected: 1 driver
+  Got: 1 drivers
+  PASS
+
+Test 2: All overlapping
+  Expected: 3 drivers
+  Got: 3 drivers
+  PASS
+
+Test 3: Mixed overlapping
+  Expected: 2 drivers
+  Got: 2 drivers
+  Assignments: [['A', 'C'], ['B', 'D']]
+  PASS
+
+
+======================================================================
+BENCHMARKING ON REALISTIC SCENARIOS
+======================================================================
+
+Scenario 1: Package Prioritization (50 deliveries)
+----------------------------------------------------------------------
+  Deliveries scheduled: 8 out of 50
+  Runtime: 0.0175 ms
+
+Scenario 2: Truck Loading (100 packages, 500 lb limit)
+----------------------------------------------------------------------
+  Total priority loaded: 4634.25
+  Total weight loaded: 500.00 lbs
+  Packages used: 32
+  Runtime: 0.0470 ms
+
+Scenario 3: Driver Assignment (60 deliveries)
+----------------------------------------------------------------------
+  Drivers needed: 18
+  Runtime: 0.1477 ms

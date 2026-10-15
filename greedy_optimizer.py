@@ -33,11 +33,16 @@ def maximize_deliveries(time_windows):
         ]
         maximize_deliveries(time_windows) returns ['A', 'C']
     """
-    # TODO: Implement greedy algorithm for activity selection
-    # Hint: What greedy choice gives you the most room for future deliveries?
-    # Hint: Think about sorting by a specific attribute
-    
-    pass  # Delete this and write your code
+    sorted_windows = sorted(time_windows, key=lambda delivery: delivery['end'])
+    selected = []
+    last_end = float('-inf')
+
+    for delivery in sorted_windows:
+        if delivery['start'] >= last_end:
+            selected.append(delivery['delivery_id'])
+            last_end = delivery['end']
+
+    return selected
 
 
 # ============================================================================
@@ -72,11 +77,32 @@ def optimize_truck_load(packages, weight_limit):
         weight_limit = 50
         optimize_truck_load(packages, 50) returns packages A (full), B (full), C (partial)
     """
-    # TODO: Implement greedy algorithm for fractional knapsack
-    # Hint: What ratio determines which packages are most valuable per pound?
-    # Hint: You can take fractions - if you have 5 lbs capacity left and a 10 lb package, take 0.5 of it
-    
-    pass  # Delete this and write your code
+    sorted_packages = sorted(
+        packages,
+        key=lambda package: package['priority'] / package['weight'],
+        reverse=True
+    )
+    remaining_weight = weight_limit
+    total_priority = 0.0
+    total_weight = 0.0
+    selected = []
+
+    for package in sorted_packages:
+        if remaining_weight <= 0:
+            break
+
+        weight_taken = min(package['weight'], remaining_weight)
+        fraction = weight_taken / package['weight']
+        selected.append({'package_id': package['package_id'], 'fraction': fraction})
+        total_priority += package['priority'] * fraction
+        total_weight += weight_taken
+        remaining_weight -= weight_taken
+
+    return {
+        'total_priority': total_priority,
+        'total_weight': total_weight,
+        'packages': selected
+    }
 
 
 # ============================================================================
@@ -108,11 +134,21 @@ def minimize_drivers(deliveries):
         ]
         minimize_drivers(deliveries) returns 2 drivers: [[A, C], [B]]
     """
-    # TODO: Implement greedy algorithm for interval scheduling
-    # Hint: How do you know if a delivery overlaps with another?
-    # Hint: Can you assign a delivery to an existing driver, or do you need a new one?
-    
-    pass  # Delete this and write your code
+    sorted_deliveries = sorted(deliveries, key=lambda delivery: delivery['start'])
+    driver_end_times = []
+    assignments = []
+
+    for delivery in sorted_deliveries:
+        for driver in range(len(driver_end_times)):
+            if delivery['start'] >= driver_end_times[driver]:
+                assignments[driver].append(delivery['delivery_id'])
+                driver_end_times[driver] = delivery['end']
+                break
+        else:
+            assignments.append([delivery['delivery_id']])
+            driver_end_times.append(delivery['end'])
+
+    return {'num_drivers': len(assignments), 'assignments': assignments}
 
 
 # ============================================================================
@@ -141,7 +177,7 @@ def test_package_prioritization():
     print(f"Test 1: Non-overlapping")
     print(f"  Expected: 3 deliveries")
     print(f"  Got: {len(result1)} deliveries")
-    print(f"  {'✓ PASS' if len(result1) == 3 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if len(result1) == 3 else 'FAIL'}\n")
     
     # Test case 2: All overlapping (should select 1)
     test2 = [
@@ -167,7 +203,7 @@ def test_package_prioritization():
     print(f"  Expected: 2 deliveries (A ends at 3, C starts at 4)")
     print(f"  Got: {len(result3)} deliveries")
     print(f"  Result: {result3}")
-    print(f"  {'✓ PASS' if len(result3) == 2 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if len(result3) == 2 else 'FAIL'}\n")
 
 
 def test_truck_loading():
@@ -185,7 +221,7 @@ def test_truck_loading():
     print(f"Test 1: All packages fit")
     print(f"  Expected: Total priority = 160, weight = 30")
     print(f"  Got: Priority = {result1['total_priority']}, weight = {result1['total_weight']}")
-    print(f"  {'✓ PASS' if result1['total_priority'] == 160 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if result1['total_priority'] == 160 else 'FAIL'}\n")
     
     # Test case 2: Fractional required
     packages2 = [
@@ -217,7 +253,7 @@ def test_driver_assignment():
     print(f"Test 1: Non-overlapping")
     print(f"  Expected: 1 driver")
     print(f"  Got: {result1['num_drivers']} drivers")
-    print(f"  {'✓ PASS' if result1['num_drivers'] == 1 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if result1['num_drivers'] == 1 else 'FAIL'}\n")
     
     # Test case 2: All overlapping (need 3 drivers)
     deliveries2 = [
@@ -229,7 +265,7 @@ def test_driver_assignment():
     print(f"Test 2: All overlapping")
     print(f"  Expected: 3 drivers")
     print(f"  Got: {result2['num_drivers']} drivers")
-    print(f"  {'✓ PASS' if result2['num_drivers'] == 3 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if result2['num_drivers'] == 3 else 'FAIL'}\n")
     
     # Test case 3: Mixed
     deliveries3 = [
@@ -243,7 +279,7 @@ def test_driver_assignment():
     print(f"  Expected: 2 drivers")
     print(f"  Got: {result3['num_drivers']} drivers")
     print(f"  Assignments: {result3['assignments']}")
-    print(f"  {'✓ PASS' if result3['num_drivers'] == 2 else '✗ FAIL'}\n")
+    print(f"  {'PASS' if result3['num_drivers'] == 2 else 'FAIL'}\n")
 
 
 def benchmark_scenarios():
@@ -292,14 +328,9 @@ def benchmark_scenarios():
 
 
 if __name__ == "__main__":
-    print("GREEDY ALGORITHMS ASSIGNMENT - STARTER CODE")
-    print("Implement the greedy functions above, then run tests.\n")
+    print("GREEDY ALGORITHMS ASSIGNMENT")
     
-    # Uncomment these as you complete each part:
-    
-    # test_package_prioritization()
-    # test_truck_loading()
-    # test_driver_assignment()
-    # benchmark_scenarios()
-    
-    print("\n⚠ Uncomment the test functions in the main block to run tests!")
+    test_package_prioritization()
+    test_truck_loading()
+    test_driver_assignment()
+    benchmark_scenarios()
